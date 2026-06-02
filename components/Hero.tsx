@@ -77,12 +77,16 @@ export default function Hero() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="font-mono text-lg md:text-xl text-stellar-cyan mb-4 min-h-[1.75rem]"
+        className="font-mono text-lg md:text-xl text-stellar-cyan mb-2 min-h-[1.75rem]"
         aria-live="polite"
       >
         {text}
         <span className="inline-block w-0.5 h-5 bg-stellar-cyan ml-0.5 animate-pulse align-middle" />
       </motion.div>
+
+      <motion.p className="font-mono text-sm text-stellar-muted" >
+        <span className="text-stellar-cyan/70"></span> )
+      </motion.p>
 
       <motion.h1
         initial={{ opacity: 0, y: 24 }}
