@@ -168,9 +168,13 @@
   background-size: calc(var(--px) * 4) calc(var(--px) * 6);
 }
 
-/* Parallax layers overscan the scene so offsets never reveal an edge. */
+/*
+ * Parallax layers overscan the scene so offsets never reveal an edge. They
+ * stack over each other, so only hotspots inside them take the pointer.
+ */
 .layer {
   position: absolute;
+  pointer-events: none;
   inset: calc(var(--px) * -12);
   will-change: transform;
 }
@@ -212,6 +216,225 @@
   66% {
     opacity: 1;
   }
+}
+
+/* A sprite is sized in sprite pixels: --w by --h, each one --px wide. */
+.sprite {
+  display: block;
+  width: calc(var(--w) * var(--px));
+  height: calc(var(--h) * var(--px));
+}
+
+/* Restores the scene's own box inside an overscanned layer. */
+.layer-frame {
+  position: absolute;
+  inset: calc(var(--px) * 12);
+}
+
+/* ── Ground ─────────────────────────────────────────────────────────── */
+
+.scene {
+  /* Where the hill's summit (and Marcelo) sits across the scene. */
+  --hill-x: 74%;
+  /* The moon keeps clear of the right edge on narrow screens. */
+  --moon-x: min(52%, calc(100% - var(--px) * 60));
+  --moon-y: 8%;
+}
+@media (min-width: 1024px) {
+  .scene {
+    --hill-x: 63%;
+    --moon-x: 78%;
+    --moon-y: 13%;
+  }
+}
+
+.ridge {
+  position: absolute;
+  inset: auto 0 calc((12 + var(--ground)) * var(--px)) 0;
+  height: calc(var(--tile-h) * var(--px));
+  background-repeat: repeat-x;
+  background-size: calc(var(--tile-w) * var(--px)) 100%;
+}
+
+.ground {
+  position: absolute;
+  inset: auto calc(var(--px) * -12) 0;
+  height: calc(var(--h) * var(--px));
+  background: theme("colors.pine");
+  box-shadow: inset 0 var(--px) 0 theme("colors.moss");
+}
+
+.hill {
+  position: absolute;
+  bottom: 0;
+  left: var(--hill-x);
+  left: round(nearest, var(--hill-x), var(--px));
+  margin-left: calc(var(--w) * var(--px) / -2);
+}
+
+.hill-top {
+  position: absolute;
+  bottom: calc(var(--summit) * var(--px));
+  left: var(--hill-x);
+  left: round(nearest, var(--hill-x), var(--px));
+  transform: translateX(-50%);
+}
+
+.ground-fade {
+  position: absolute;
+  inset: auto calc(var(--px) * -12) 0;
+  height: calc(var(--px) * 6);
+  background-repeat: repeat-x;
+  background-size: calc(var(--px) * 4) calc(var(--px) * 6);
+}
+
+/* Character idle loop. Inside the SVG, 1px is one sprite pixel. */
+.char-breathe {
+  animation: char-breathe 3.6s step-end infinite;
+}
+@keyframes char-breathe {
+  50% {
+    transform: translateY(1px);
+  }
+}
+.char-hair {
+  animation: char-hair 5.8s step-end infinite;
+}
+@keyframes char-hair {
+  62% {
+    transform: translateX(-1px);
+  }
+  74% {
+    transform: none;
+  }
+}
+.char-lid {
+  opacity: 0;
+  animation: char-lid 4.7s step-end infinite;
+}
+@keyframes char-lid {
+  93% {
+    opacity: 1;
+  }
+  97% {
+    opacity: 0;
+  }
+}
+
+/* ── Hotspots (moon, planets) ───────────────────────────────────────── */
+
+.hotspot {
+  position: absolute;
+  pointer-events: auto;
+  display: grid;
+  justify-items: center;
+  cursor: pointer;
+  color: theme("colors.night.700");
+}
+.hotspot:hover,
+.hotspot:focus-visible {
+  color: theme("colors.amber");
+}
+.hotspot-label {
+  position: absolute;
+  top: 100%;
+  padding: var(--px) calc(var(--px) * 2);
+  white-space: nowrap;
+  color: theme("colors.cream");
+  background: theme("colors.ink");
+  opacity: 0;
+}
+.hotspot:hover .hotspot-label,
+.hotspot:focus-visible .hotspot-label {
+  opacity: 1;
+}
+/* No hover on touch screens, so names stay visible there. */
+@media (hover: none) {
+  .hotspot-label {
+    opacity: 1;
+  }
+}
+
+.moon {
+  left: var(--moon-x);
+  left: round(nearest, var(--moon-x), var(--px));
+  top: var(--moon-y);
+  top: round(nearest, var(--moon-y), var(--px));
+}
+
+.float {
+  animation: float 7s step-end infinite;
+}
+@keyframes float {
+  50% {
+    transform: translateY(var(--px));
+  }
+}
+
+/* ── Dialog window ──────────────────────────────────────────────────── */
+
+html {
+  scrollbar-gutter: stable;
+}
+html:has(dialog[open]) {
+  overflow: hidden;
+}
+
+.px-dialog {
+  /* Dialogs live inside parallax layers, which switch the pointer off. */
+  pointer-events: auto;
+  width: 100%;
+  max-width: min(40rem, calc(100vw - 1rem));
+  max-height: none;
+  padding: 0;
+  border: 0;
+  overflow: visible;
+  color: inherit;
+  background: transparent;
+}
+/* The window drops into place in two hard steps. */
+.px-dialog[open] > .px-box {
+  animation: dialog-in 0.14s step-end;
+}
+@keyframes dialog-in {
+  0% {
+    transform: translateY(calc(var(--px) * -4));
+  }
+  50% {
+    transform: translateY(calc(var(--px) * -2));
+  }
+}
+/* A checkerboard of ink pixels dims the scene without a soft overlay. */
+.px-dialog::backdrop {
+  background-color: rgb(13 11 30 / 0.6);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 2' shape-rendering='crispEdges'%3E%3Cpath fill='%230d0b1e' d='M0 0h1v1h-1zM1 1h1v1h-1z'/%3E%3C/svg%3E");
+  background-size: calc(var(--px, 4px) * 2) calc(var(--px, 4px) * 2);
+}
+.px-dialog-body {
+  max-height: calc(100dvh - 7rem);
+  padding: calc(var(--px) * 4);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+@media (min-width: 640px) {
+  .px-dialog-body {
+    padding: calc(var(--px) * 6);
+  }
+}
+.px-close {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin: calc(var(--px) * -2) calc(var(--px) * -3) calc(var(--px) * -2) 0;
+  color: theme("colors.cream");
+}
+.px-close:hover {
+  color: theme("colors.ink");
+  background: theme("colors.amber");
+}
+.px-close:focus-visible {
+  outline-offset: calc(var(--px) * -1);
 }
 
 /* Hero roles: four stacked lines, one visible at a time. */

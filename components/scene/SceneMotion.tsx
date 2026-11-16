@@ -36,6 +36,7 @@ export default function SceneMotion() {
       el,
       depth: Number(el.dataset.depth),
       scroll: Number(el.dataset.scroll ?? 0),
+      lockY: el.dataset.lockY !== undefined,
     }));
 
     let px = 4;
@@ -58,9 +59,10 @@ export default function SceneMotion() {
       const scrollY = window.scrollY;
       for (const layer of layers) {
         const dx = Math.round(-x * layer.depth) * px;
-        const dy =
-          Math.round(-y * layer.depth * 0.5) * px +
-          Math.round((scrollY * layer.scroll) / px) * px;
+        const dy = layer.lockY
+          ? 0
+          : Math.round(-y * layer.depth * 0.5) * px +
+            Math.round((scrollY * layer.scroll) / px) * px;
         layer.el.style.transform = `translate3d(${dx}px, ${dy}px, 0)`;
       }
       if (Math.abs(targetX - x) > 0.002 || Math.abs(targetY - y) > 0.002) schedule();

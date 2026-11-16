@@ -1,16 +1,20 @@
+import Ground from "./Ground";
+import Moon from "./Moon";
 import Sky from "./Sky";
 import SceneMotion from "./SceneMotion";
 
 const roles = ["Full Stack Developer", "AI Engineer", "Problem Solver", "Builder"];
 
-/** The full-screen opening scene: sky, title and (in later stages) the cast. */
+/** The full-screen opening scene: sky, title, moon, and Marcelo on his hill. */
 export default function Scene() {
   return (
     <section id="scene" className="scene" aria-labelledby="scene-title">
       <Sky />
       <SceneMotion />
 
-      <div className="relative mx-auto flex h-full max-w-6xl flex-col justify-center px-5 pb-16 pt-24">
+      {/* Title first in the DOM so it is read and focused before the sky. */}
+      <div className="pointer-events-none relative z-10 mx-auto flex h-full max-w-6xl flex-col justify-center px-5 pb-24 pt-24">
+        <div className="pointer-events-auto max-w-md">
         <p className="font-term text-xl text-mist flex items-center gap-u2">
           <span className="blink inline-block h-u2 w-u2 bg-teal" aria-hidden />
           Lima, PE · Open to work
@@ -51,11 +55,20 @@ export default function Scene() {
             Get in Touch
           </a>
         </div>
+        </div>
       </div>
+
+      <div className="layer" data-depth="5" data-scroll="0.3">
+        <div className="layer-frame">
+          <Moon />
+        </div>
+      </div>
+
+      <Ground />
 
       <a
         href="#about"
-        className="label text-cream hover:text-amber absolute bottom-u4 left-1/2 flex -translate-x-1/2 flex-col items-center gap-u2 p-u2"
+        className="label text-cream hover:text-amber absolute bottom-u2 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-u2 p-u2"
       >
         Scroll
         <svg className="bob" width="20" height="12" viewBox="0 0 5 3" aria-hidden>
