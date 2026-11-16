@@ -1,11 +1,12 @@
 import Ground from "./Ground";
 import Moon from "./Moon";
+import Planets from "./Planets";
 import Sky from "./Sky";
 import SceneMotion from "./SceneMotion";
 
 const roles = ["Full Stack Developer", "AI Engineer", "Problem Solver", "Builder"];
 
-/** The full-screen opening scene: sky, title, moon, and Marcelo on his hill. */
+/** The opening scene: sky, title, moon, one planet per project, and Marcelo on his hill. */
 export default function Scene() {
   return (
     <section id="scene" className="scene" aria-labelledby="scene-title">
@@ -13,7 +14,7 @@ export default function Scene() {
       <SceneMotion />
 
       {/* Title first in the DOM so it is read and focused before the sky. */}
-      <div className="pointer-events-none relative z-10 mx-auto flex h-full max-w-6xl flex-col justify-center px-5 pb-24 pt-24">
+      <div className="pointer-events-none relative z-10 mx-auto flex h-full max-w-6xl flex-col px-5 pb-24 pt-24 lg:justify-center">
         <div className="pointer-events-auto max-w-md">
         <p className="font-term text-xl text-mist flex items-center gap-u2">
           <span className="blink inline-block h-u2 w-u2 bg-teal" aria-hidden />
@@ -55,12 +56,21 @@ export default function Scene() {
             Get in Touch
           </a>
         </div>
+
+        <p className="font-term text-mist mt-u4 text-xl leading-tight">
+          <span className="text-amber" aria-hidden>
+            *{" "}
+          </span>
+          Every planet is a project. The moon is me.
+        </p>
         </div>
       </div>
 
-      <div className="layer" data-depth="5" data-scroll="0.3">
+      {/* The moon and the project planets share one layer. */}
+      <div className="layer" data-depth="5">
         <div className="layer-frame">
           <Moon />
+          <Planets />
         </div>
       </div>
 

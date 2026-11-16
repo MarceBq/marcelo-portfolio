@@ -136,13 +136,23 @@
 /* ── Scene ──────────────────────────────────────────────────────────── */
 
 .scene {
+  /* Narrow screens get a tall scene so the planets can zigzag down it. */
+  --scene-h: calc(var(--px) * 500);
   position: relative;
   overflow: hidden;
-  min-height: 34rem;
-  height: 100svh;
-  /* Snap the height to the pixel grid where round() is supported. */
-  height: max(34rem, round(down, 100svh, var(--px)));
+  height: var(--scene-h);
   background: theme("colors.night.900");
+}
+@media (min-width: 1024px) {
+  .scene {
+    --scene-h: max(34rem, 100svh);
+  }
+  /* Snap the height to the pixel grid where round() is supported. */
+  @supports (height: round(down, 1px, 1px)) {
+    .scene {
+      --scene-h: max(34rem, round(down, 100svh, var(--px)));
+    }
+  }
 }
 
 .sky-bands {
@@ -154,8 +164,8 @@
 .sky-band {
   position: relative;
   flex: none;
-  height: calc(var(--h) * 1svh);
-  height: round(nearest, calc(var(--h) * 1svh), var(--px));
+  height: calc(var(--scene-h) * var(--h) / 100);
+  height: round(nearest, calc(var(--scene-h) * var(--h) / 100), var(--px));
 }
 .sky-band:last-child {
   flex: 1;
@@ -238,7 +248,7 @@
   --hill-x: 74%;
   /* The moon keeps clear of the right edge on narrow screens. */
   --moon-x: min(52%, calc(100% - var(--px) * 60));
-  --moon-y: 8%;
+  --moon-y: 31%;
 }
 @media (min-width: 1024px) {
   .scene {
@@ -325,21 +335,48 @@
 
 .hotspot {
   position: absolute;
-  pointer-events: auto;
   display: grid;
-  justify-items: center;
+  place-items: center;
+  pointer-events: auto;
   cursor: pointer;
   color: theme("colors.night.700");
 }
+/* Selection brackets: four amber corners, shown on hover and keyboard focus. */
+.hotspot::before {
+  --c: theme("colors.amber");
+  --arm: calc(var(--px) * 4);
+  content: "";
+  position: absolute;
+  inset: calc(var(--px) * -2);
+  opacity: 0;
+  background:
+    linear-gradient(var(--c), var(--c)) top left / var(--arm) var(--px),
+    linear-gradient(var(--c), var(--c)) top left / var(--px) var(--arm),
+    linear-gradient(var(--c), var(--c)) top right / var(--arm) var(--px),
+    linear-gradient(var(--c), var(--c)) top right / var(--px) var(--arm),
+    linear-gradient(var(--c), var(--c)) bottom left / var(--arm) var(--px),
+    linear-gradient(var(--c), var(--c)) bottom left / var(--px) var(--arm),
+    linear-gradient(var(--c), var(--c)) bottom right / var(--arm) var(--px),
+    linear-gradient(var(--c), var(--c)) bottom right / var(--px) var(--arm);
+  background-repeat: no-repeat;
+}
 .hotspot:hover,
 .hotspot:focus-visible {
+  z-index: 1;
+  outline: none;
   color: theme("colors.amber");
+}
+.hotspot:hover::before,
+.hotspot:focus-visible::before {
+  opacity: 1;
 }
 .hotspot-label {
   position: absolute;
-  top: 100%;
+  top: calc(100% + var(--px) * 3);
+  width: max-content;
+  max-width: 9rem;
   padding: var(--px) calc(var(--px) * 2);
-  white-space: nowrap;
+  text-align: center;
   color: theme("colors.cream");
   background: theme("colors.ink");
   opacity: 0;
@@ -351,6 +388,126 @@
 /* No hover on touch screens, so names stay visible there. */
 @media (hover: none) {
   .hotspot-label {
+    opacity: 1;
+  }
+}
+@media (min-width: 1024px) {
+  .hotspot-label {
+    max-width: none;
+  }
+}
+
+/* Planets are placed by their centre: --mx/--my on narrow screens, --x/--y on wide. */
+.planet {
+  left: var(--mx);
+  left: round(nearest, var(--mx), var(--px));
+  top: var(--my);
+  top: round(nearest, var(--my), var(--px));
+  /* Small planets still get a comfortable target. */
+  min-width: max(3rem, calc(var(--px) * 12));
+  min-height: max(3rem, calc(var(--px) * 12));
+  transform: translate(-50%, -50%);
+}
+@media (min-width: 1024px) {
+  .planet {
+    left: var(--x);
+    left: round(nearest, var(--x), var(--px));
+    top: var(--y);
+    top: round(nearest, var(--y), var(--px));
+  }
+}
+.planet-body {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+/* Inside the SVG, 1px is one sprite pixel: the surface scrolls a full turn. */
+.spin {
+  animation: spin linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: translateX(calc(var(--p) * -1px));
+  }
+}
+
+/*
+ * A moonlet circles its planet in sixteen pixel-snapped steps. The front copy
+ * shows for the near half of the orbit and the back copy, drawn behind the
+ * planet, for the far half.
+ */
+.orbit {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: calc(var(--px) * -2) 0 0 calc(var(--px) * -2);
+  transform: translate(calc(var(--rx) * var(--px)), 0);
+  animation:
+    orbit var(--period) step-end infinite,
+    orbit-front var(--period) step-end infinite;
+}
+.orbit-back {
+  opacity: 0;
+  animation-name: orbit, orbit-back;
+}
+@keyframes orbit {
+  0% {
+    transform: translate(round(nearest, calc(var(--rx) * 1 * var(--px)), var(--px)), 0px);
+  }
+  6.25% {
+    transform: translate(round(nearest, calc(var(--rx) * 0.924 * var(--px)), var(--px)), round(nearest, calc(var(--ry) * 0.383 * var(--px)), var(--px)));
+  }
+  12.5% {
+    transform: translate(round(nearest, calc(var(--rx) * 0.707 * var(--px)), var(--px)), round(nearest, calc(var(--ry) * 0.707 * var(--px)), var(--px)));
+  }
+  18.75% {
+    transform: translate(round(nearest, calc(var(--rx) * 0.383 * var(--px)), var(--px)), round(nearest, calc(var(--ry) * 0.924 * var(--px)), var(--px)));
+  }
+  25% {
+    transform: translate(0px, round(nearest, calc(var(--ry) * 1 * var(--px)), var(--px)));
+  }
+  31.25% {
+    transform: translate(round(nearest, calc(var(--rx) * -0.383 * var(--px)), var(--px)), round(nearest, calc(var(--ry) * 0.924 * var(--px)), var(--px)));
+  }
+  37.5% {
+    transform: translate(round(nearest, calc(var(--rx) * -0.707 * var(--px)), var(--px)), round(nearest, calc(var(--ry) * 0.707 * var(--px)), var(--px)));
+  }
+  43.75% {
+    transform: translate(round(nearest, calc(var(--rx) * -0.924 * var(--px)), var(--px)), round(nearest, calc(var(--ry) * 0.383 * var(--px)), var(--px)));
+  }
+  50% {
+    transform: translate(round(nearest, calc(var(--rx) * -1 * var(--px)), var(--px)), 0px);
+  }
+  56.25% {
+    transform: translate(round(nearest, calc(var(--rx) * -0.924 * var(--px)), var(--px)), round(nearest, calc(var(--ry) * -0.383 * var(--px)), var(--px)));
+  }
+  62.5% {
+    transform: translate(round(nearest, calc(var(--rx) * -0.707 * var(--px)), var(--px)), round(nearest, calc(var(--ry) * -0.707 * var(--px)), var(--px)));
+  }
+  68.75% {
+    transform: translate(round(nearest, calc(var(--rx) * -0.383 * var(--px)), var(--px)), round(nearest, calc(var(--ry) * -0.924 * var(--px)), var(--px)));
+  }
+  75% {
+    transform: translate(0px, round(nearest, calc(var(--ry) * -1 * var(--px)), var(--px)));
+  }
+  81.25% {
+    transform: translate(round(nearest, calc(var(--rx) * 0.383 * var(--px)), var(--px)), round(nearest, calc(var(--ry) * -0.924 * var(--px)), var(--px)));
+  }
+  87.5% {
+    transform: translate(round(nearest, calc(var(--rx) * 0.707 * var(--px)), var(--px)), round(nearest, calc(var(--ry) * -0.707 * var(--px)), var(--px)));
+  }
+  93.75% {
+    transform: translate(round(nearest, calc(var(--rx) * 0.924 * var(--px)), var(--px)), round(nearest, calc(var(--ry) * -0.383 * var(--px)), var(--px)));
+  }
+}
+@keyframes orbit-front {
+  50% {
+    opacity: 0;
+  }
+}
+@keyframes orbit-back {
+  50% {
     opacity: 1;
   }
 }

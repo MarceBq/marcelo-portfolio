@@ -7,7 +7,8 @@ import { useEffect } from "react";
  *  - parallax: offsets every [data-depth] layer by pointer and scroll,
  *    snapped to whole sprite pixels so nothing lands between pixels;
  *  - pausing: stops CSS animations while the tab is hidden or the scene is
- *    scrolled out of view.
+ *    scrolled out of view;
+ *  - arrow keys: move focus between the moon and the planets.
  * Renders nothing. With prefers-reduced-motion it leaves the scene still.
  */
 export default function SceneMotion() {
@@ -82,6 +83,18 @@ export default function SceneMotion() {
       schedule();
     };
 
+    // With a hotspot focused, the arrow keys step through the others.
+    const onKey = (e: KeyboardEvent) => {
+      const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+      const current = document.activeElement;
+      if (!step || !(current instanceof HTMLElement) || !current.matches(".hotspot")) return;
+      const spots = Array.from(scene.querySelectorAll<HTMLElement>(".hotspot"));
+      const next = spots[(spots.indexOf(current) + step + spots.length) % spots.length];
+      e.preventDefault();
+      next.focus();
+    };
+    scene.addEventListener("keydown", onKey);
+
     window.addEventListener("pointermove", onPointer, { passive: true });
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", onResize);
@@ -90,6 +103,7 @@ export default function SceneMotion() {
     return () => {
       document.removeEventListener("visibilitychange", onVisibility);
       io.disconnect();
+      scene.removeEventListener("keydown", onKey);
       window.removeEventListener("pointermove", onPointer);
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", onResize);
