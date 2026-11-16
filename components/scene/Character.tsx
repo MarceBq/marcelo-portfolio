@@ -5,19 +5,22 @@ import Sprite from "./Sprite";
 /*
  * Marcelo, in profile, looking right toward the moon: black curly hair,
  * glasses, headphones, blue polo, backpack, black trousers, white sneakers.
- * An original sprite, 20 x 32 pixels, drawn in three parts so the upper body
+ * An original sprite, 20 x 33 pixels, drawn in three parts so the upper body
  * can breathe over the legs.
  */
 const legend: Legend = {
-  H: "ink", // hair
-  h: "ash", // hair, moonlit curls
+  H: "hair",
+  K: "hairShade",
+  h: "hairLight", // loose clusters of two or three pixels read as curls
   A: "amber", // headphones
   a: "rust", // headphone cup
+  L: "skinLight", // moonlit edge of the face and arm
   S: "skin",
   s: "skinShade",
+  d: "skinDeep", // mouth, under the chin
   G: "ink", // glasses frame
-  W: "cream", // eye
-  E: "ink", // pupil
+  E: "eye",
+  g: "cream", // glint in the eye
   B: "blue", // polo
   b: "night600", // polo shade
   l: "sky", // polo highlight
@@ -31,21 +34,22 @@ const legend: Legend = {
 
 const hairTop = [
   ".......HHH.HH.......",
-  ".....HHhHHHHhHH.....",
+  ".....HHhhHHHHHH.....",
 ];
 
 const head = [
-  "....HHhHHAHHHhHHH...",
-  "...HHHHHHAHHHHHhHH..",
-  "...HhHHHHAHHhHHHHH..",
-  "...HHHHhHAHSSSSSSh..",
-  "...HhHHHAAAGGGGGG...",
-  "....HHHHAaASGWWEG...",
-  "....HhHHAaASGGGGGS..",
-  ".....HHHAAASSSSSS...",
-  "......HHsSSSSSSsS...",
-  ".......HsSSSSSSS....",
-  "..........sSS.......",
+  "....HHHHHAHHhhHHH...",
+  "...HHhHHHAHHHhHHHH..",
+  "...HHhHHHAHHHHHHhH..",
+  "...KHHHHHAHsSSSSLh..",
+  "...KHhHHAAAGGGGGG...",
+  "....hHHHAaASGLEgG...",
+  "....KHHHAaASGLEEG...",
+  "....KKHHAAASGGGGGL..",
+  ".....KKHsSSSSSSSL...",
+  "......KKsSSSSSSdS...",
+  ".......KssSSSSSS....",
+  "..........dsS.......",
 ];
 
 const torso = [
@@ -53,15 +57,15 @@ const torso = [
   "....MMMMmBBBBBl.....",
   "...MMMMMmBbBBBl.....",
   "...MmMMMmBbllBl.....",
-  "...MMMMMmBsSSBl.....",
-  "...MMmMMBBsSSBl.....",
-  "...MMMMMBBsSSBl.....",
-  "....MMMMBBsSSBB.....",
-  "....mmmmBBsSSBB.....",
+  "...MMMMMmBsSLBl.....",
+  "...MMmMMBBsSLBl.....",
+  "...MMMMMBBsSLBl.....",
+  "....MMMMBBsSLBB.....",
+  "....mmmmBBsSLBB.....",
 ];
 
 const legs = [
-  "........NNNSSNN.....",
+  "........NNNSLNN.....",
   "........NNNNNNr.....",
   "........NNNNNNr.....",
   "........NNNNNNr.....",
@@ -99,7 +103,7 @@ export default function Character() {
           <Sprite paths={hairTopPaths} />
         </g>
         {/* Eyelid: covers the eye for a frame or two. */}
-        <rect className="char-lid" x="13" y="7" width="3" height="1" fill={palette.skin} />
+        <rect className="char-lid" x="13" y="7" width="3" height="2" fill={palette.skin} />
       </g>
     </svg>
   );

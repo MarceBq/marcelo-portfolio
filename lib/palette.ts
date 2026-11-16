@@ -1,6 +1,7 @@
 /**
- * The whole site draws from these 23 colours and nothing else:
- * night tones for the sky and UI, cream for light, warm accents for life.
+ * The whole site draws from these colours and nothing else: night tones for
+ * the sky and UI, cream for light, warm accents for life, plus the eight
+ * tones of Marcelo's own skin, hair and eyes.
  * Tailwind and the sprite renderer both read from here.
  */
 export const palette = {
@@ -29,9 +30,15 @@ export const palette = {
   blue: "#3b6fc4",
   moss: "#4f8a63",
   pine: "#234a47",
-  // character
-  skin: "#b97a56",
-  skinShade: "#8f5a40",
+  // character: skin, curly black hair, eyes
+  skinLight: "#e8b48a",
+  skin: "#c98a62",
+  skinShade: "#9a5e48",
+  skinDeep: "#6b3b36",
+  hairLight: "#4a3a4e",
+  hair: "#2a2030",
+  hairShade: "#15101a",
+  eye: "#3b2418",
 } as const;
 
 export type PaletteColor = keyof typeof palette;
