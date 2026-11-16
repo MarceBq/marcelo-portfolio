@@ -1,5 +1,11 @@
 export type ProjectType = "dev" | "ai";
 
+export interface ProjectImage {
+  /** Path under public/, e.g. "/projects/taskflow-1.png". */
+  src: string;
+  alt: string;
+}
+
 export interface Project {
   id: string;
   type: ProjectType;
@@ -11,6 +17,8 @@ export interface Project {
   wip?: boolean;
   progress?: number;
   aiPowered?: boolean;
+  /** Screenshots shown in the project's window. */
+  images?: ProjectImage[];
 }
 
 export const projects: Project[] = [
