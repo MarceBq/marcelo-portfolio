@@ -2,57 +2,272 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * --px is the size of one sprite pixel. Every sprite, border and star is a
+ * whole multiple of it, so the page keeps a single pixel resolution.
+ */
+:root {
+  --px: 3px;
+}
+@media (min-width: 640px) {
+  :root {
+    --px: 4px;
+  }
+}
+@media (min-width: 1920px) {
+  :root {
+    --px: 5px;
+  }
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
-    scroll-padding-top: 80px;
+    scroll-padding-top: 5.5rem;
+    @apply bg-night-900;
   }
 
   body {
-    background-color: #03020a;
-    color: #f1f5f9;
-    font-family: var(--font-dm-sans), system-ui, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
+    @apply bg-night-900 text-cream font-body antialiased overflow-x-hidden;
   }
 
   ::selection {
-    background-color: rgba(56, 189, 248, 0.3);
-    color: #f1f5f9;
+    @apply bg-amber text-ink;
+  }
+
+  :focus-visible {
+    outline: var(--px) solid theme("colors.amber");
+    outline-offset: calc(var(--px) * 2);
+  }
+
+  svg {
+    shape-rendering: crispEdges;
   }
 }
 
-.glass-card {
-  background: rgba(15, 15, 30, 0.6);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(148, 163, 184, 0.12);
-}
-
-.planet-sphere {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #7dd3fc, #38bdf8 40%, #1e3a5f 70%, #03020a);
-  box-shadow:
-    inset -12px -12px 40px rgba(0, 0, 0, 0.6),
-    0 0 40px rgba(56, 189, 248, 0.25);
-  animation: planet-rotate 20s linear infinite;
-}
-
-
-@keyframes planet-rotate {
-  from {
-    transform: rotate(0deg);
+@layer components {
+  /*
+   * Retro window frame. Four hard offset shadows draw the outline and leave
+   * the corners notched; an inset line adds the inner bevel. No blur anywhere.
+   */
+  .px-box {
+    --edge: theme("colors.ink");
+    --bevel: theme("colors.dusk.500");
+    margin: var(--px);
+    background: theme("colors.night.800");
+    box-shadow:
+      calc(var(--px) * -1) 0 0 0 var(--edge),
+      var(--px) 0 0 0 var(--edge),
+      0 calc(var(--px) * -1) 0 0 var(--edge),
+      0 var(--px) 0 0 var(--edge),
+      inset 0 0 0 var(--px) var(--bevel);
   }
+
+  .px-titlebar {
+    @apply font-pixel text-cream bg-dusk-500 flex items-center gap-u3 uppercase;
+    margin: var(--px);
+    padding: calc(var(--px) * 2) calc(var(--px) * 3);
+    font-size: 0.625rem;
+    line-height: 1.6;
+    letter-spacing: 0.04em;
+  }
+
+  .px-btn {
+    --face: theme("colors.amber");
+    --shade: theme("colors.rust");
+    @apply font-pixel text-ink inline-flex items-center justify-center gap-u2 uppercase;
+    margin: var(--px);
+    padding: calc(var(--px) * 3) calc(var(--px) * 4) calc(var(--px) * 4);
+    min-height: 44px;
+    font-size: 0.625rem;
+    line-height: 1.4;
+    letter-spacing: 0.04em;
+    background: var(--face);
+    box-shadow:
+      calc(var(--px) * -1) 0 0 0 theme("colors.ink"),
+      var(--px) 0 0 0 theme("colors.ink"),
+      0 calc(var(--px) * -1) 0 0 theme("colors.ink"),
+      0 var(--px) 0 0 theme("colors.ink"),
+      inset 0 calc(var(--px) * -1) 0 0 var(--shade);
+  }
+  .px-btn:hover {
+    --face: theme("colors.cream");
+  }
+  .px-btn:active {
+    transform: translateY(var(--px));
+  }
+  .px-btn-ghost {
+    --face: theme("colors.night.700");
+    --shade: theme("colors.night.900");
+    @apply text-cream;
+  }
+  .px-btn-ghost:hover {
+    --face: theme("colors.night.600");
+  }
+
+  .px-tag {
+    @apply font-term text-mist bg-night-900 inline-block;
+    padding: 0 calc(var(--px) * 2);
+    font-size: 1.125rem;
+    line-height: 1.5;
+  }
+
+  .px-link {
+    @apply font-term text-amber underline underline-offset-4;
+    font-size: 1.25rem;
+    text-decoration-thickness: 2px;
+  }
+  .px-link:hover {
+    @apply text-cream;
+  }
+
+  .title-shadow {
+    text-shadow: var(--px) var(--px) 0 theme("colors.dusk.500");
+  }
+
+  .label {
+    @apply font-pixel uppercase;
+    font-size: 0.625rem;
+    line-height: 1.6;
+    letter-spacing: 0.04em;
+  }
+}
+
+/* ── Scene ──────────────────────────────────────────────────────────── */
+
+.scene {
+  position: relative;
+  overflow: hidden;
+  min-height: 34rem;
+  height: 100svh;
+  /* Snap the height to the pixel grid where round() is supported. */
+  height: max(34rem, round(down, 100svh, var(--px)));
+  background: theme("colors.night.900");
+}
+
+.sky-bands {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+}
+.sky-band {
+  position: relative;
+  flex: none;
+  height: calc(var(--h) * 1svh);
+  height: round(nearest, calc(var(--h) * 1svh), var(--px));
+}
+.sky-band:last-child {
+  flex: 1;
+}
+.sky-dither {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: calc(var(--px) * 6);
+  background-repeat: repeat-x;
+  background-size: calc(var(--px) * 4) calc(var(--px) * 6);
+}
+
+/* Parallax layers overscan the scene so offsets never reveal an edge. */
+.layer {
+  position: absolute;
+  inset: calc(var(--px) * -12);
+  will-change: transform;
+}
+
+/*
+ * A star field: one repeating tile that drifts a sprite pixel at a time. The
+ * element is one tile wider than its layer, so the loop has no seam.
+ */
+.stars {
+  position: absolute;
+  inset: 0 calc(var(--tile) * var(--px) * -1) 0 0;
+  background-repeat: repeat;
+  background-size: calc(var(--tile) * var(--px)) calc(var(--tile) * var(--px));
+  animation: drift var(--drift) infinite;
+}
+.stars.twinkle {
+  animation:
+    drift var(--drift) infinite,
+    twinkle var(--twinkle) infinite var(--twinkle-delay, 0s);
+}
+
+@keyframes drift {
   to {
-    transform: rotate(360deg);
+    transform: translateX(calc(var(--tile) * var(--px) * -1));
   }
 }
 
-@media (pointer: fine) {
-  body.custom-cursor,
-  body.custom-cursor a,
-  body.custom-cursor button {
-    cursor: none;
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  44% {
+    opacity: 0.25;
+  }
+  58% {
+    opacity: 0.6;
+  }
+  66% {
+    opacity: 1;
+  }
+}
+
+/* Hero roles: four stacked lines, one visible at a time. */
+.role {
+  opacity: 0;
+  animation: role 12s step-end infinite;
+}
+.role:first-child {
+  opacity: 1;
+}
+@keyframes role {
+  0% {
+    opacity: 1;
+  }
+  25%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.bob {
+  animation: bob 1.6s step-end infinite;
+}
+@keyframes bob {
+  50% {
+    transform: translateY(var(--px));
+  }
+}
+
+.blink {
+  animation: blink 1.2s step-end infinite;
+}
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* ── Motion control ─────────────────────────────────────────────────── */
+
+/* Set by SceneMotion while the tab is hidden or the scene is off screen. */
+html[data-paused] *,
+html[data-paused] *::before,
+html[data-paused] *::after,
+.scene[data-offscreen] * {
+  animation-play-state: paused !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
   }
 }
