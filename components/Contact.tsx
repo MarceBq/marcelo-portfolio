@@ -1,14 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { contactEmail, socials } from "@/data/contact";
 import Section from "./ui/Section";
 import PixelWindow from "./ui/PixelWindow";
-
-const socials = [
-  { label: "GitHub", href: "https://github.com" },
-  { label: "LinkedIn", href: "https://linkedin.com" },
-  { label: "Email", href: "mailto:hello@marcelo.dev" },
-];
 
 const fieldClass =
   "font-term text-cream placeholder:text-haze bg-night-900 block w-full border-[length:var(--px)] border-dusk-500 px-u3 py-u2 text-xl focus:border-amber";
@@ -29,7 +24,7 @@ export default function Contact() {
     const subject = encodeURIComponent(`Portfolio contact from ${name}`);
     const body = encodeURIComponent(`${message}\n\n— ${name} (${email})`);
     setTimeout(() => {
-      window.location.href = `mailto:hello@marcelo.dev?subject=${subject}&body=${body}`;
+      window.location.href = `mailto:${contactEmail}?subject=${subject}&body=${body}`;
     }, 600);
   };
 
