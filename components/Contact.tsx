@@ -1,23 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { Github, Linkedin, Mail, Rocket } from "lucide-react";
-import SectionHeading from "./SectionHeading";
+import Section from "./ui/Section";
+import PixelWindow from "./ui/PixelWindow";
 
 const socials = [
-  { label: "GitHub", href: "https://github.com", icon: Github },
-  { label: "LinkedIn", href: "https://linkedin.com", icon: Linkedin },
-  { label: "Email", href: "mailto:hello@marcelo.dev", icon: Mail },
+  { label: "GitHub", href: "https://github.com" },
+  { label: "LinkedIn", href: "https://linkedin.com" },
+  { label: "Email", href: "mailto:hello@marcelo.dev" },
 ];
+
+const fieldClass =
+  "font-term text-cream placeholder:text-haze bg-night-900 block w-full border-[length:var(--px)] border-dusk-500 px-u3 py-u2 text-xl focus:border-amber";
 
 export default function Contact() {
   const [launched, setLaunched] = useState(false);
 
+  // No backend: the form hands the message to the visitor's mail client.
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const form = e.currentTarget;
-    const data = new FormData(form);
+    const data = new FormData(e.currentTarget);
     const name = String(data.get("name") ?? "").trim();
     const email = String(data.get("email") ?? "").trim();
     const message = String(data.get("message") ?? "").trim();
@@ -32,80 +34,69 @@ export default function Contact() {
   };
 
   return (
-    <section id="contact" className="relative py-24 md:py-32 px-5 max-w-6xl mx-auto">
-      <SectionHeading
-        index="06 — contact"
-        title="Launch a message"
-        subtitle="Got a problem to solve? Let's build something."
-      />
-
-      <div className="grid lg:grid-cols-2 gap-12">
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-        >
-          <p className="text-stellar-muted text-lg mb-8">
+    <Section
+      id="contact"
+      index="06 — contact"
+      title="Launch a message"
+      subtitle="Got a problem to solve? Let's build something."
+    >
+      <div className="grid items-start gap-10 lg:grid-cols-2 lg:gap-16">
+        <div>
+          <p className="text-mist text-lg leading-relaxed">
             Based in Lima, open to remote. Whether you&apos;re hiring, collaborating, or just want
             to talk tech — I&apos;d love to hear from you.
           </p>
-          <div className="space-y-3">
-            {socials.map(({ label, href, icon: Icon }) => (
-              <a
-                key={label}
-                href={href}
-                target={label !== "Email" ? "_blank" : undefined}
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 p-4 glass-card rounded-lg hover:border-stellar-cyan/30 hover:translate-x-1 transition-all group"
-              >
-                <Icon size={18} className="text-stellar-cyan group-hover:scale-110 transition-transform" />
-                <span className="font-mono text-sm text-stellar-muted group-hover:text-stellar-text">
+          <ul className="mt-u6 space-y-u2">
+            {socials.map(({ label, href }) => (
+              <li key={label}>
+                <a
+                  href={href}
+                  target={label !== "Email" ? "_blank" : undefined}
+                  rel="noopener noreferrer"
+                  className="px-box font-term text-cream hover:text-amber flex items-center gap-u3 p-u4 text-2xl leading-none"
+                >
+                  <span className="text-amber" aria-hidden>
+                    &gt;
+                  </span>
                   {label}
-                </span>
-              </a>
+                </a>
+              </li>
             ))}
-          </div>
-        </motion.div>
+          </ul>
+        </div>
 
-        <motion.form
-          initial={{ opacity: 0, x: 20 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          onSubmit={handleSubmit}
-          className="glass-card rounded-xl overflow-hidden border border-stellar-cyan/20"
-        >
-          <div className="px-4 py-3 border-b border-space-border bg-space-void/80 font-mono text-[0.65rem] text-stellar-muted">
-            transmit.sh — open channel
-          </div>
-          <div className="p-6 space-y-5">
+        <PixelWindow title="transmit.sh — open channel">
+          <form onSubmit={handleSubmit} className="space-y-u4">
             <div>
-              <label htmlFor="name" className="font-mono text-[0.65rem] uppercase tracking-wider text-stellar-cyan/80 block mb-2">
-                name
+              <label htmlFor="name" className="label text-mist mb-u2 block">
+                Name
               </label>
               <input
                 id="name"
                 name="name"
                 required
+                autoComplete="name"
                 placeholder="Jane Doe"
-                className="w-full bg-space-deep border border-space-border rounded-lg px-4 py-3 font-mono text-sm text-stellar-text placeholder:text-stellar-muted/50 focus:outline-none focus:border-stellar-cyan/50 focus:ring-2 focus:ring-stellar-cyan/10"
+                className={fieldClass}
               />
             </div>
             <div>
-              <label htmlFor="email" className="font-mono text-[0.65rem] uppercase tracking-wider text-stellar-cyan/80 block mb-2">
-                email
+              <label htmlFor="email" className="label text-mist mb-u2 block">
+                Email
               </label>
               <input
                 id="email"
                 name="email"
                 type="email"
                 required
+                autoComplete="email"
                 placeholder="you@company.com"
-                className="w-full bg-space-deep border border-space-border rounded-lg px-4 py-3 font-mono text-sm text-stellar-text placeholder:text-stellar-muted/50 focus:outline-none focus:border-stellar-cyan/50 focus:ring-2 focus:ring-stellar-cyan/10"
+                className={fieldClass}
               />
             </div>
             <div>
-              <label htmlFor="message" className="font-mono text-[0.65rem] uppercase tracking-wider text-stellar-cyan/80 block mb-2">
-                message
+              <label htmlFor="message" className="label text-mist mb-u2 block">
+                Message
               </label>
               <textarea
                 id="message"
@@ -113,27 +104,20 @@ export default function Contact() {
                 required
                 rows={4}
                 placeholder="Describe the mission..."
-                className="w-full bg-space-deep border border-space-border rounded-lg px-4 py-3 font-mono text-sm text-stellar-text placeholder:text-stellar-muted/50 focus:outline-none focus:border-stellar-cyan/50 focus:ring-2 focus:ring-stellar-cyan/10 resize-y"
+                className={`${fieldClass} resize-y`}
               />
             </div>
 
-            <motion.button
-              type="submit"
-              animate={launched ? { y: -8, opacity: 0.9 } : { y: 0 }}
-              className="w-full flex items-center justify-center gap-2 font-mono text-xs font-semibold uppercase tracking-wider py-4 rounded-lg bg-stellar-cyan text-space-deep hover:shadow-glow transition-shadow"
-            >
-              <Rocket size={16} className={launched ? "animate-bounce" : ""} />
+            <button type="submit" className="px-btn !mx-u w-[calc(100%-var(--px)*2)]">
               {launched ? "Launching..." : "Send transmission"}
-            </motion.button>
+            </button>
 
-            {launched && (
-              <p className="font-mono text-xs text-stellar-cyan text-center" role="status">
-                ✓ Opening your mail client — thanks for reaching out!
-              </p>
-            )}
-          </div>
-        </motion.form>
+            <p className="font-term text-teal text-center text-xl" role="status">
+              {launched && "Opening your mail client — thanks for reaching out!"}
+            </p>
+          </form>
+        </PixelWindow>
       </div>
-    </section>
+    </Section>
   );
 }
