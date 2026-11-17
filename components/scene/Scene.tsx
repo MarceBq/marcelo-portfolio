@@ -1,3 +1,4 @@
+import Ambient from "./Ambient";
 import Ground from "./Ground";
 import Moon from "./Moon";
 import Planets from "./Planets";
@@ -65,6 +66,8 @@ export default function Scene() {
         </p>
         </div>
       </div>
+
+      <Ambient />
 
       {/* The moon and the project planets share one layer. */}
       <div className="layer" data-depth="5">

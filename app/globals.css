@@ -331,6 +331,119 @@
   }
 }
 
+/* ── Background life ────────────────────────────────────────────────── */
+
+.scene {
+  --sat-y: 5.5%;
+  --ship-y: 56%;
+  /* The alien hides on whichever slope of the hill is on screen. */
+  --alien-dx: -60;
+}
+@media (min-width: 1024px) {
+  .scene {
+    --sat-y: 8.5%;
+    --ship-y: 26%;
+    --alien-dx: 60;
+  }
+}
+
+/* A shooting star waits out of sight for most of its cycle, then streaks past. */
+.comet {
+  position: absolute;
+  top: var(--y);
+  left: var(--x);
+  opacity: 0;
+  animation: comet var(--every) infinite var(--delay);
+}
+@keyframes comet {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0);
+    animation-timing-function: step-end;
+  }
+  93% {
+    opacity: 1;
+    transform: translate(0, 0);
+    animation-timing-function: steps(30);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(calc(var(--px) * -120 * var(--dir)), calc(var(--px) * 60));
+  }
+}
+
+.satellite {
+  position: absolute;
+  top: var(--sat-y);
+  left: calc(var(--px) * -20);
+  animation: cross-right 90s infinite -4s;
+}
+@keyframes cross-right {
+  0% {
+    transform: translateX(0);
+    animation-timing-function: steps(270);
+  }
+  55%,
+  100% {
+    transform: translateX(calc(var(--px) * 540));
+  }
+}
+
+.ship {
+  position: absolute;
+  top: var(--ship-y);
+  left: 100%;
+  animation: cross-left 67s infinite -40s;
+}
+@keyframes cross-left {
+  0% {
+    transform: translateX(0);
+    animation-timing-function: steps(270);
+  }
+  24%,
+  100% {
+    transform: translateX(calc(var(--px) * -540));
+  }
+}
+
+/* The alien rises from behind the hill in three steps, waves, and sinks back. */
+.alien {
+  position: absolute;
+  bottom: calc(var(--px) * 14);
+  left: calc(var(--hill-x) + var(--px) * (var(--alien-dx) - 7));
+  left: calc(round(nearest, var(--hill-x), var(--px)) + var(--px) * (var(--alien-dx) - 7));
+  animation: alien-peek 26s step-end infinite -12s;
+}
+/* On narrow screens it sits on the left slope, so it is mirrored to face Marcelo. */
+.alien .sprite {
+  transform: scaleX(-1);
+}
+@media (min-width: 1024px) {
+  .alien .sprite {
+    transform: none;
+  }
+}
+@keyframes alien-peek {
+  70% {
+    transform: translateY(calc(var(--px) * -7));
+  }
+  71% {
+    transform: translateY(calc(var(--px) * -14));
+  }
+  72% {
+    transform: translateY(calc(var(--px) * -21));
+  }
+  90% {
+    transform: translateY(calc(var(--px) * -14));
+  }
+  91% {
+    transform: translateY(calc(var(--px) * -7));
+  }
+  92% {
+    transform: none;
+  }
+}
+
 /* ── Hotspots (moon, planets) ───────────────────────────────────────── */
 
 .hotspot {
@@ -445,11 +558,11 @@
   transform: translate(calc(var(--rx) * var(--px)), 0);
   animation:
     orbit var(--period) step-end infinite,
-    orbit-front var(--period) step-end infinite;
+    first-half var(--period) step-end infinite;
 }
 .orbit-back {
   opacity: 0;
-  animation-name: orbit, orbit-back;
+  animation-name: orbit, second-half;
 }
 @keyframes orbit {
   0% {
@@ -501,12 +614,20 @@
     transform: translate(round(nearest, calc(var(--rx) * 0.924 * var(--px)), var(--px)), round(nearest, calc(var(--ry) * -0.383 * var(--px)), var(--px)));
   }
 }
-@keyframes orbit-front {
+/* Two halves of one cycle: used to swap between a pair of frames. */
+.first-half {
+  animation: first-half 1s step-end infinite;
+}
+.second-half {
+  opacity: 0;
+  animation: second-half 1s step-end infinite;
+}
+@keyframes first-half {
   50% {
     opacity: 0;
   }
 }
-@keyframes orbit-back {
+@keyframes second-half {
   50% {
     opacity: 1;
   }
@@ -649,5 +770,12 @@ html[data-paused] *::after,
   *::after {
     animation: none !important;
     transition: none !important;
+  }
+  /* The still version keeps a little life: a parked satellite, a peeking alien. */
+  .satellite {
+    left: 20%;
+  }
+  .alien {
+    transform: translateY(calc(var(--px) * -21));
   }
 }
