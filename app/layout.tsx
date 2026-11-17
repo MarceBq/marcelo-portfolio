@@ -1,23 +1,28 @@
-import type { Metadata } from "next";
-import { Orbitron, DM_Sans, JetBrains_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Press_Start_2P, VT323, DM_Sans } from "next/font/google";
+import { palette } from "@/lib/palette";
 import "./globals.css";
 
-const orbitron = Orbitron({
+// Pixel face for titles and labels.
+const pixel = Press_Start_2P({
   subsets: ["latin"],
-  variable: "--font-orbitron",
-  display: "swap",
-  weight: ["500", "600", "700", "800"],
-});
-
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  variable: "--font-dm-sans",
+  weight: "400",
+  variable: "--font-pixel",
   display: "swap",
 });
 
-const jetbrains = JetBrains_Mono({
+// Terminal face for interface text.
+const term = VT323({
   subsets: ["latin"],
-  variable: "--font-jetbrains",
+  weight: "400",
+  variable: "--font-term",
+  display: "swap",
+});
+
+// Readable face for long paragraphs.
+const body = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-body",
   display: "swap",
 });
 
@@ -48,6 +53,10 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  themeColor: palette.night900,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -56,20 +65,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${orbitron.variable} ${dmSans.variable} ${jetbrains.variable}`}
+      className={`${pixel.variable} ${term.variable} ${body.variable}`}
     >
-      <head>
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
-        />
-      </head>
-      <body className="custom-cursor min-h-screen">
-        {/* Nebula ambient layers */}
-        <div className="fixed inset-0 bg-nebula-tl pointer-events-none z-0" aria-hidden />
-        <div className="fixed inset-0 bg-nebula-br pointer-events-none z-0" aria-hidden />
-        {children}
-      </body>
+      <body className="min-h-screen">{children}</body>
     </html>
   );
 }

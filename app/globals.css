@@ -2,57 +2,816 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * --px is the size of one sprite pixel. Every sprite, border and star is a
+ * whole multiple of it, so the page keeps a single pixel resolution.
+ */
+:root {
+  --px: 3px;
+}
+@media (min-width: 640px) {
+  :root {
+    --px: 4px;
+  }
+}
+@media (min-width: 1920px) {
+  :root {
+    --px: 5px;
+  }
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
-    scroll-padding-top: 80px;
+    scroll-padding-top: 5.5rem;
+    @apply bg-night-900;
   }
 
   body {
-    background-color: #03020a;
-    color: #f1f5f9;
-    font-family: var(--font-dm-sans), system-ui, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
+    @apply bg-night-900 text-cream font-body antialiased overflow-x-hidden;
   }
 
   ::selection {
-    background-color: rgba(56, 189, 248, 0.3);
-    color: #f1f5f9;
+    @apply bg-amber text-ink;
+  }
+
+  :focus-visible {
+    outline: var(--px) solid theme("colors.amber");
+    outline-offset: calc(var(--px) * 2);
+  }
+
+  svg {
+    shape-rendering: crispEdges;
   }
 }
 
-.glass-card {
-  background: rgba(15, 15, 30, 0.6);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(148, 163, 184, 0.12);
-}
-
-.planet-sphere {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #7dd3fc, #38bdf8 40%, #1e3a5f 70%, #03020a);
-  box-shadow:
-    inset -12px -12px 40px rgba(0, 0, 0, 0.6),
-    0 0 40px rgba(56, 189, 248, 0.25);
-  animation: planet-rotate 20s linear infinite;
-}
-
-
-@keyframes planet-rotate {
-  from {
-    transform: rotate(0deg);
+@layer components {
+  /*
+   * Retro window frame. Four hard offset shadows draw the outline and leave
+   * the corners notched; an inset line adds the inner bevel. No blur anywhere.
+   */
+  .px-box {
+    --edge: theme("colors.ink");
+    --bevel: theme("colors.dusk.500");
+    margin: var(--px);
+    background: theme("colors.night.800");
+    box-shadow:
+      calc(var(--px) * -1) 0 0 0 var(--edge),
+      var(--px) 0 0 0 var(--edge),
+      0 calc(var(--px) * -1) 0 0 var(--edge),
+      0 var(--px) 0 0 var(--edge),
+      inset 0 0 0 var(--px) var(--bevel);
   }
+
+  .px-titlebar {
+    @apply font-pixel text-cream bg-dusk-500 flex items-center gap-u3 uppercase;
+    margin: var(--px);
+    padding: calc(var(--px) * 2) calc(var(--px) * 3);
+    font-size: 0.625rem;
+    line-height: 1.6;
+    letter-spacing: 0.04em;
+  }
+
+  .px-btn {
+    --face: theme("colors.amber");
+    --shade: theme("colors.rust");
+    @apply font-pixel text-ink inline-flex items-center justify-center gap-u2 uppercase;
+    margin: var(--px);
+    padding: calc(var(--px) * 3) calc(var(--px) * 4) calc(var(--px) * 4);
+    min-height: 44px;
+    font-size: 0.625rem;
+    line-height: 1.4;
+    letter-spacing: 0.04em;
+    background: var(--face);
+    box-shadow:
+      calc(var(--px) * -1) 0 0 0 theme("colors.ink"),
+      var(--px) 0 0 0 theme("colors.ink"),
+      0 calc(var(--px) * -1) 0 0 theme("colors.ink"),
+      0 var(--px) 0 0 theme("colors.ink"),
+      inset 0 calc(var(--px) * -1) 0 0 var(--shade);
+  }
+  .px-btn:hover {
+    --face: theme("colors.cream");
+  }
+  .px-btn:active {
+    transform: translateY(var(--px));
+  }
+  .px-btn-ghost {
+    --face: theme("colors.night.700");
+    --shade: theme("colors.night.900");
+    @apply text-cream;
+  }
+  .px-btn-ghost:hover {
+    --face: theme("colors.night.600");
+  }
+
+  .px-tag {
+    @apply font-term text-mist bg-night-900 inline-block;
+    padding: 0 calc(var(--px) * 2);
+    font-size: 1.125rem;
+    line-height: 1.5;
+  }
+
+  .px-link {
+    @apply font-term text-amber inline-block underline underline-offset-4;
+    /* Padding makes the link a comfortable touch target. */
+    padding: calc(var(--px) * 2) 0;
+    font-size: 1.25rem;
+    text-decoration-thickness: 2px;
+  }
+  .px-link:hover {
+    @apply text-cream;
+  }
+
+  .title-shadow {
+    text-shadow: var(--px) var(--px) 0 theme("colors.dusk.500");
+  }
+
+  /*
+   * Segmented bar in one element: a hard-stopped fill, with the gaps between
+   * segments cut out by a mask.
+   */
+  .stat-bar {
+    --seg: calc((100% + var(--px)) / var(--max));
+    display: block;
+    height: calc(var(--px) * 2);
+    background: linear-gradient(
+      90deg,
+      currentColor calc(100% * var(--value) / var(--max)),
+      theme("colors.night.900") 0
+    );
+    mask: repeating-linear-gradient(
+      90deg,
+      #000 0 calc(var(--seg) - var(--px)),
+      transparent 0 var(--seg)
+    );
+  }
+
+  .label {
+    @apply font-pixel uppercase;
+    font-size: 0.625rem;
+    line-height: 1.6;
+    letter-spacing: 0.04em;
+  }
+}
+
+/* ── Scene ──────────────────────────────────────────────────────────── */
+
+.scene {
+  /* Narrow screens get a tall scene so the planets can zigzag down it. */
+  --scene-h: calc(var(--px) * 500);
+  position: relative;
+  overflow: hidden;
+  height: var(--scene-h);
+  background: theme("colors.night.900");
+}
+/* Tablets have room beside the planets, so the sky can be shorter. */
+@media (min-width: 640px) {
+  .scene {
+    --scene-h: calc(var(--px) * 380);
+  }
+}
+@media (min-width: 1280px) {
+  .scene {
+    --scene-h: max(34rem, 100svh);
+  }
+  /* Snap the height to the pixel grid where round() is supported. */
+  @supports (height: round(down, 1px, 1px)) {
+    .scene {
+      --scene-h: max(34rem, round(down, 100svh, var(--px)));
+    }
+  }
+}
+
+.sky-bands {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+}
+.sky-band {
+  position: relative;
+  flex: none;
+  height: calc(var(--scene-h) * var(--h) / 100);
+  height: round(nearest, calc(var(--scene-h) * var(--h) / 100), var(--px));
+}
+.sky-band:last-child {
+  flex: 1;
+}
+.sky-dither {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: calc(var(--px) * 6);
+  background-repeat: repeat-x;
+  background-size: calc(var(--px) * 4) calc(var(--px) * 6);
+}
+
+/*
+ * Parallax layers overscan the scene so offsets never reveal an edge. They
+ * stack over each other, so only hotspots inside them take the pointer.
+ */
+.layer {
+  position: absolute;
+  pointer-events: none;
+  inset: calc(var(--px) * -12);
+  will-change: transform;
+}
+
+/*
+ * A star field: one repeating tile that drifts a sprite pixel at a time. The
+ * element is one tile wider than its layer, so the loop has no seam.
+ */
+.stars {
+  position: absolute;
+  inset: 0 calc(var(--tile) * var(--px) * -1) 0 0;
+  background-repeat: repeat;
+  background-size: calc(var(--tile) * var(--px)) calc(var(--tile) * var(--px));
+  animation: drift var(--drift) infinite;
+}
+.stars.twinkle {
+  animation:
+    drift var(--drift) infinite,
+    twinkle var(--twinkle) infinite var(--twinkle-delay, 0s);
+}
+
+@keyframes drift {
   to {
-    transform: rotate(360deg);
+    transform: translateX(calc(var(--tile) * var(--px) * -1));
   }
 }
 
-@media (pointer: fine) {
-  body.custom-cursor,
-  body.custom-cursor a,
-  body.custom-cursor button {
-    cursor: none;
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  44% {
+    opacity: 0.25;
+  }
+  58% {
+    opacity: 0.6;
+  }
+  66% {
+    opacity: 1;
+  }
+}
+
+/* A sprite is sized in sprite pixels: --w by --h, each one --px wide. */
+.sprite {
+  display: block;
+  width: calc(var(--w) * var(--px));
+  height: calc(var(--h) * var(--px));
+}
+
+/* Restores the scene's own box inside an overscanned layer. */
+.layer-frame {
+  position: absolute;
+  inset: calc(var(--px) * 12);
+}
+
+/* ── Ground ─────────────────────────────────────────────────────────── */
+
+.scene {
+  /* Where the hill's summit (and Marcelo) sits across the scene. */
+  --hill-x: 74%;
+  /* The moon keeps clear of the right edge on narrow screens. */
+  --moon-x: min(52%, calc(100% - var(--px) * 60));
+  --moon-y: 31%;
+}
+@media (min-width: 1280px) {
+  .scene {
+    --hill-x: 63%;
+    --moon-x: 78%;
+    --moon-y: 13%;
+  }
+}
+
+.ridge {
+  position: absolute;
+  inset: auto 0 calc((12 + var(--ground)) * var(--px)) 0;
+  height: calc(var(--tile-h) * var(--px));
+  background-repeat: repeat-x;
+  background-size: calc(var(--tile-w) * var(--px)) 100%;
+}
+
+.ground {
+  position: absolute;
+  inset: auto calc(var(--px) * -12) 0;
+  height: calc(var(--h) * var(--px));
+  background: theme("colors.pine");
+  box-shadow: inset 0 var(--px) 0 theme("colors.moss");
+}
+
+.hill {
+  position: absolute;
+  bottom: 0;
+  left: var(--hill-x);
+  left: round(nearest, var(--hill-x), var(--px));
+  margin-left: calc(var(--w) * var(--px) / -2);
+}
+
+.hill-top {
+  position: absolute;
+  bottom: calc(var(--summit) * var(--px));
+  left: var(--hill-x);
+  left: round(nearest, var(--hill-x), var(--px));
+  transform: translateX(-50%);
+}
+
+.ground-fade {
+  position: absolute;
+  inset: auto calc(var(--px) * -12) 0;
+  height: calc(var(--px) * 6);
+  background-repeat: repeat-x;
+  background-size: calc(var(--px) * 4) calc(var(--px) * 6);
+}
+
+/* Character idle loop. Inside the SVG, 1px is one sprite pixel. */
+.char-breathe {
+  animation: char-breathe 3.6s step-end infinite;
+}
+@keyframes char-breathe {
+  50% {
+    transform: translateY(1px);
+  }
+}
+.char-hair {
+  animation: char-hair 5.8s step-end infinite;
+}
+@keyframes char-hair {
+  62% {
+    transform: translateX(-1px);
+  }
+  74% {
+    transform: none;
+  }
+}
+.char-lid {
+  opacity: 0;
+  animation: char-lid 4.7s step-end infinite;
+}
+@keyframes char-lid {
+  93% {
+    opacity: 1;
+  }
+  97% {
+    opacity: 0;
+  }
+}
+
+/* ── Background life ────────────────────────────────────────────────── */
+
+.scene {
+  /* Just under the nav bar, clear of the title. */
+  --sat-y: calc(var(--px) * 24);
+  --ship-y: 56%;
+  /* The alien hides on whichever slope of the hill is on screen. */
+  --alien-dx: -60;
+}
+@media (min-width: 640px) {
+  .scene {
+    --sat-y: calc(var(--px) * 21);
+  }
+}
+@media (min-width: 1280px) {
+  .scene {
+    --sat-y: max(11%, calc(var(--px) * 22));
+    --ship-y: 26%;
+    --alien-dx: 60;
+  }
+}
+
+/* A shooting star waits out of sight for most of its cycle, then streaks past. */
+.comet {
+  position: absolute;
+  top: var(--y);
+  left: var(--x);
+  opacity: 0;
+  animation: comet var(--every) infinite var(--delay);
+}
+@keyframes comet {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0);
+    animation-timing-function: step-end;
+  }
+  93% {
+    opacity: 1;
+    transform: translate(0, 0);
+    animation-timing-function: steps(30);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(calc(var(--px) * -120 * var(--dir)), calc(var(--px) * 60));
+  }
+}
+
+.satellite {
+  position: absolute;
+  top: var(--sat-y);
+  left: calc(var(--px) * -20);
+  animation: cross-right 90s infinite -4s;
+}
+@keyframes cross-right {
+  0% {
+    transform: translateX(0);
+    animation-timing-function: steps(270);
+  }
+  55%,
+  100% {
+    transform: translateX(calc(var(--px) * 540));
+  }
+}
+
+.ship {
+  position: absolute;
+  top: var(--ship-y);
+  left: 100%;
+  animation: cross-left 67s infinite -40s;
+}
+@keyframes cross-left {
+  0% {
+    transform: translateX(0);
+    animation-timing-function: steps(270);
+  }
+  24%,
+  100% {
+    transform: translateX(calc(var(--px) * -540));
+  }
+}
+
+/* The alien rises from behind the hill in three steps, waves, and sinks back. */
+.alien {
+  position: absolute;
+  bottom: calc(var(--px) * 14);
+  left: calc(var(--hill-x) + var(--px) * (var(--alien-dx) - 7));
+  left: calc(round(nearest, var(--hill-x), var(--px)) + var(--px) * (var(--alien-dx) - 7));
+  animation: alien-peek 26s step-end infinite -12s;
+}
+/* On narrow screens it sits on the left slope, so it is mirrored to face Marcelo. */
+.alien .sprite {
+  transform: scaleX(-1);
+}
+@media (min-width: 1280px) {
+  .alien .sprite {
+    transform: none;
+  }
+}
+@keyframes alien-peek {
+  70% {
+    transform: translateY(calc(var(--px) * -7));
+  }
+  71% {
+    transform: translateY(calc(var(--px) * -14));
+  }
+  72% {
+    transform: translateY(calc(var(--px) * -21));
+  }
+  90% {
+    transform: translateY(calc(var(--px) * -14));
+  }
+  91% {
+    transform: translateY(calc(var(--px) * -7));
+  }
+  92% {
+    transform: none;
+  }
+}
+
+/* ── Hotspots (moon, planets) ───────────────────────────────────────── */
+
+.hotspot {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  pointer-events: auto;
+  cursor: pointer;
+  color: theme("colors.night.700");
+}
+/* Selection brackets: four amber corners, shown on hover and keyboard focus. */
+.hotspot::before {
+  --c: theme("colors.amber");
+  --arm: calc(var(--px) * 4);
+  content: "";
+  position: absolute;
+  inset: calc(var(--px) * -2);
+  opacity: 0;
+  background:
+    linear-gradient(var(--c), var(--c)) top left / var(--arm) var(--px),
+    linear-gradient(var(--c), var(--c)) top left / var(--px) var(--arm),
+    linear-gradient(var(--c), var(--c)) top right / var(--arm) var(--px),
+    linear-gradient(var(--c), var(--c)) top right / var(--px) var(--arm),
+    linear-gradient(var(--c), var(--c)) bottom left / var(--arm) var(--px),
+    linear-gradient(var(--c), var(--c)) bottom left / var(--px) var(--arm),
+    linear-gradient(var(--c), var(--c)) bottom right / var(--arm) var(--px),
+    linear-gradient(var(--c), var(--c)) bottom right / var(--px) var(--arm);
+  background-repeat: no-repeat;
+}
+.hotspot:hover,
+.hotspot:focus-visible {
+  z-index: 1;
+  outline: none;
+  color: theme("colors.amber");
+}
+.hotspot:hover::before,
+.hotspot:focus-visible::before {
+  opacity: 1;
+}
+.hotspot-label {
+  position: absolute;
+  top: calc(100% + var(--px) * 2);
+  padding: 0 calc(var(--px) * 2);
+  font-family: theme("fontFamily.term");
+  font-size: 1.125rem;
+  line-height: 1.15;
+  white-space: nowrap;
+  color: theme("colors.cream");
+  background: theme("colors.ink");
+  opacity: 0;
+}
+.hotspot:hover .hotspot-label,
+.hotspot:focus-visible .hotspot-label {
+  opacity: 1;
+}
+/* No hover on touch screens, so names stay visible there. */
+@media (hover: none) {
+  .hotspot-label {
+    opacity: 1;
+  }
+}
+@media (min-width: 1280px) {
+  .hotspot-label {
+    font-size: 1.25rem;
+  }
+}
+
+/* Planets are placed by their centre: --mx/--my on narrow screens, --x/--y on wide. */
+.planet {
+  left: var(--mx);
+  left: round(nearest, var(--mx), var(--px));
+  top: var(--my);
+  top: round(nearest, var(--my), var(--px));
+  /* Small planets still get a comfortable target. */
+  min-width: max(3rem, calc(var(--px) * 12));
+  min-height: max(3rem, calc(var(--px) * 12));
+  transform: translate(-50%, -50%);
+}
+@media (min-width: 1280px) {
+  .planet {
+    left: var(--x);
+    left: round(nearest, var(--x), var(--px));
+    /* On short screens the top row stays clear of the nav bar. */
+    top: max(var(--y), calc(var(--px) * 30));
+    top: round(nearest, max(var(--y), calc(var(--px) * 30)), var(--px));
+  }
+}
+.planet-body {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+/* Inside the SVG, 1px is one sprite pixel: the surface scrolls a full turn. */
+.spin {
+  animation: spin linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: translateX(calc(var(--p) * -1px));
+  }
+}
+
+/*
+ * A moonlet circles its planet in sixteen pixel-snapped steps. The front copy
+ * shows for the near half of the orbit and the back copy, drawn behind the
+ * planet, for the far half.
+ */
+.orbit {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: calc(var(--px) * -2) 0 0 calc(var(--px) * -2);
+  transform: translate(calc(var(--rx) * var(--px)), 0);
+  animation:
+    orbit var(--period) step-end infinite,
+    first-half var(--period) step-end infinite;
+}
+.orbit-back {
+  opacity: 0;
+  animation-name: orbit, second-half;
+}
+@keyframes orbit {
+  0% {
+    transform: translate(round(nearest, calc(var(--rx) * 1 * var(--px)), var(--px)), 0px);
+  }
+  6.25% {
+    transform: translate(round(nearest, calc(var(--rx) * 0.924 * var(--px)), var(--px)), round(nearest, calc(var(--ry) * 0.383 * var(--px)), var(--px)));
+  }
+  12.5% {
+    transform: translate(round(nearest, calc(var(--rx) * 0.707 * var(--px)), var(--px)), round(nearest, calc(var(--ry) * 0.707 * var(--px)), var(--px)));
+  }
+  18.75% {
+    transform: translate(round(nearest, calc(var(--rx) * 0.383 * var(--px)), var(--px)), round(nearest, calc(var(--ry) * 0.924 * var(--px)), var(--px)));
+  }
+  25% {
+    transform: translate(0px, round(nearest, calc(var(--ry) * 1 * var(--px)), var(--px)));
+  }
+  31.25% {
+    transform: translate(round(nearest, calc(var(--rx) * -0.383 * var(--px)), var(--px)), round(nearest, calc(var(--ry) * 0.924 * var(--px)), var(--px)));
+  }
+  37.5% {
+    transform: translate(round(nearest, calc(var(--rx) * -0.707 * var(--px)), var(--px)), round(nearest, calc(var(--ry) * 0.707 * var(--px)), var(--px)));
+  }
+  43.75% {
+    transform: translate(round(nearest, calc(var(--rx) * -0.924 * var(--px)), var(--px)), round(nearest, calc(var(--ry) * 0.383 * var(--px)), var(--px)));
+  }
+  50% {
+    transform: translate(round(nearest, calc(var(--rx) * -1 * var(--px)), var(--px)), 0px);
+  }
+  56.25% {
+    transform: translate(round(nearest, calc(var(--rx) * -0.924 * var(--px)), var(--px)), round(nearest, calc(var(--ry) * -0.383 * var(--px)), var(--px)));
+  }
+  62.5% {
+    transform: translate(round(nearest, calc(var(--rx) * -0.707 * var(--px)), var(--px)), round(nearest, calc(var(--ry) * -0.707 * var(--px)), var(--px)));
+  }
+  68.75% {
+    transform: translate(round(nearest, calc(var(--rx) * -0.383 * var(--px)), var(--px)), round(nearest, calc(var(--ry) * -0.924 * var(--px)), var(--px)));
+  }
+  75% {
+    transform: translate(0px, round(nearest, calc(var(--ry) * -1 * var(--px)), var(--px)));
+  }
+  81.25% {
+    transform: translate(round(nearest, calc(var(--rx) * 0.383 * var(--px)), var(--px)), round(nearest, calc(var(--ry) * -0.924 * var(--px)), var(--px)));
+  }
+  87.5% {
+    transform: translate(round(nearest, calc(var(--rx) * 0.707 * var(--px)), var(--px)), round(nearest, calc(var(--ry) * -0.707 * var(--px)), var(--px)));
+  }
+  93.75% {
+    transform: translate(round(nearest, calc(var(--rx) * 0.924 * var(--px)), var(--px)), round(nearest, calc(var(--ry) * -0.383 * var(--px)), var(--px)));
+  }
+}
+/* Two halves of one cycle: used to swap between a pair of frames. */
+.first-half {
+  animation: first-half 1s step-end infinite;
+}
+.second-half {
+  opacity: 0;
+  animation: second-half 1s step-end infinite;
+}
+@keyframes first-half {
+  50% {
+    opacity: 0;
+  }
+}
+@keyframes second-half {
+  50% {
+    opacity: 1;
+  }
+}
+
+.moon {
+  left: var(--moon-x);
+  left: round(nearest, var(--moon-x), var(--px));
+  top: var(--moon-y);
+  top: round(nearest, var(--moon-y), var(--px));
+}
+
+.float {
+  animation: float 7s step-end infinite;
+}
+@keyframes float {
+  50% {
+    transform: translateY(var(--px));
+  }
+}
+
+/* ── Dialog window ──────────────────────────────────────────────────── */
+
+html {
+  scrollbar-gutter: stable;
+}
+html:has(dialog[open]) {
+  overflow: hidden;
+}
+
+.px-dialog {
+  /* Dialogs live inside parallax layers, which switch the pointer off. */
+  pointer-events: auto;
+  width: 100%;
+  max-width: min(40rem, calc(100vw - 1rem));
+  max-height: none;
+  padding: 0;
+  border: 0;
+  overflow: visible;
+  color: inherit;
+  background: transparent;
+}
+/* The window drops into place in two hard steps. */
+.px-dialog[open] > .px-box {
+  animation: dialog-in 0.14s step-end;
+}
+@keyframes dialog-in {
+  0% {
+    transform: translateY(calc(var(--px) * -4));
+  }
+  50% {
+    transform: translateY(calc(var(--px) * -2));
+  }
+}
+/* A checkerboard of ink pixels dims the scene without a soft overlay. */
+.px-dialog::backdrop {
+  background-color: rgb(13 11 30 / 0.6);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 2' shape-rendering='crispEdges'%3E%3Cpath fill='%230d0b1e' d='M0 0h1v1h-1zM1 1h1v1h-1z'/%3E%3C/svg%3E");
+  background-size: calc(var(--px, 4px) * 2) calc(var(--px, 4px) * 2);
+}
+.px-dialog-body {
+  max-height: calc(100dvh - 7rem);
+  padding: calc(var(--px) * 4);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+@media (min-width: 640px) {
+  .px-dialog-body {
+    padding: calc(var(--px) * 6);
+  }
+}
+.px-close {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin: calc(var(--px) * -2) calc(var(--px) * -3) calc(var(--px) * -2) 0;
+  color: theme("colors.cream");
+}
+.px-close:hover {
+  color: theme("colors.ink");
+  background: theme("colors.amber");
+}
+.px-close:focus-visible {
+  outline-offset: calc(var(--px) * -1);
+}
+
+/* Hero roles: four stacked lines, one visible at a time. */
+.role {
+  opacity: 0;
+  animation: role 12s step-end infinite;
+}
+.role:first-child {
+  opacity: 1;
+}
+@keyframes role {
+  0% {
+    opacity: 1;
+  }
+  25%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.bob {
+  animation: bob 1.6s step-end infinite;
+}
+@keyframes bob {
+  50% {
+    transform: translateY(var(--px));
+  }
+}
+
+.blink {
+  animation: blink 1.2s step-end infinite;
+}
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* ── Motion control ─────────────────────────────────────────────────── */
+
+/* Set by SceneMotion while the tab is hidden or the scene is off screen. */
+html[data-paused] *,
+html[data-paused] *::before,
+html[data-paused] *::after,
+.scene[data-offscreen] * {
+  animation-play-state: paused !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  /* The still version keeps a little life: a parked satellite, a peeking alien. */
+  .satellite {
+    left: 20%;
+  }
+  .alien {
+    transform: translateY(calc(var(--px) * -21));
   }
 }
