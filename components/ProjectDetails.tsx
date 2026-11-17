@@ -16,7 +16,7 @@ export default function ProjectDetails({ project, withImages = false }: ProjectD
     <>
       {(project.aiPowered || project.wip) && (
         <p className="mb-u3 flex flex-wrap gap-u2">
-          {project.aiPowered && <span className="label bg-dusk-400 text-ink px-u2">AI-powered</span>}
+          {project.aiPowered && <span className="label bg-haze text-ink px-u2">AI-powered</span>}
           {project.wip && <span className="label bg-amber text-ink px-u2">WIP</span>}
         </p>
       )}

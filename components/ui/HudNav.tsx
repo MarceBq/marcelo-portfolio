@@ -1,16 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cvHref, navLinks } from "@/lib/utils";
 
 /** Fixed heads-up bar: brand, section links and the CV button. */
 export default function HudNav() {
   const [open, setOpen] = useState(false);
+  const menuButton = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key !== "Escape") return;
+      setOpen(false);
+      // The menu is about to unmount; keep focus on something that stays.
+      menuButton.current?.focus();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -29,7 +33,7 @@ export default function HudNav() {
         aria-label="Main"
         className="px-box mx-auto flex max-w-6xl items-center justify-between gap-u4 px-u4 py-u2"
       >
-        <a href="#scene" className="label text-cream py-u2">
+        <a href="#scene" className="label text-cream py-u4">
           marcelo<span className="text-amber">.</span>space
         </a>
 
@@ -47,12 +51,13 @@ export default function HudNav() {
         </ul>
 
         <div className="flex items-center gap-u2">
-          <a href={cvHref} download className="px-btn !min-h-0 !py-u2">
+          <a href={cvHref} download className="px-btn !min-h-10 !py-u2">
             CV
           </a>
           <button
+            ref={menuButton}
             type="button"
-            className="px-btn px-btn-ghost !min-h-0 !py-u2 md:hidden"
+            className="px-btn px-btn-ghost !min-h-10 !py-u2 md:hidden"
             aria-expanded={open}
             aria-controls="hud-menu"
             onClick={() => setOpen((v) => !v)}

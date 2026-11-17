@@ -113,7 +113,9 @@
   }
 
   .px-link {
-    @apply font-term text-amber underline underline-offset-4;
+    @apply font-term text-amber inline-block underline underline-offset-4;
+    /* Padding makes the link a comfortable touch target. */
+    padding: calc(var(--px) * 2) 0;
     font-size: 1.25rem;
     text-decoration-thickness: 2px;
   }

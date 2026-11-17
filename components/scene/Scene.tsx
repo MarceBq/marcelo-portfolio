@@ -70,7 +70,7 @@ export default function Scene() {
       <Ambient />
 
       {/* The moon and the project planets share one layer. */}
-      <div className="layer" data-depth="5">
+      <div className="layer" data-depth="5" role="group" aria-label="Sky map: the moon and one planet per project">
         <div className="layer-frame">
           <Moon />
           <Planets />
