@@ -68,7 +68,7 @@ export const planets: Record<string, PlanetPlacement> = {
       seed: 5,
     },
     desktop: [57, 33],
-    mobile: [66, 51],
+    mobile: [66, 53],
   },
   // Molten world with two small moons.
   "ai-n8n-pipeline": {

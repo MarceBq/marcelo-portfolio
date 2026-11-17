@@ -375,7 +375,7 @@
 }
 @media (min-width: 1280px) {
   .scene {
-    --sat-y: 8.5%;
+    --sat-y: max(11%, calc(var(--px) * 22));
     --ship-y: 26%;
     --alien-dx: 60;
   }
