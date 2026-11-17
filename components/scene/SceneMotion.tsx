@@ -26,8 +26,13 @@ export default function SceneMotion() {
     let onScreen = true;
     const io = new IntersectionObserver(([entry]) => {
       onScreen = entry.isIntersecting;
-      if (onScreen) scene.removeAttribute("data-offscreen");
-      else scene.setAttribute("data-offscreen", "");
+      if (onScreen) {
+        scene.removeAttribute("data-offscreen");
+        // Scroll events were ignored while off screen, so catch the layers up.
+        schedule();
+      } else {
+        scene.setAttribute("data-offscreen", "");
+      }
     });
     io.observe(scene);
 
