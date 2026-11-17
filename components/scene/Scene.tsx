@@ -15,7 +15,7 @@ export default function Scene() {
       <SceneMotion />
 
       {/* Title first in the DOM so it is read and focused before the sky. */}
-      <div className="pointer-events-none relative z-10 mx-auto flex h-full max-w-6xl flex-col px-5 pb-24 pt-24 lg:justify-center">
+      <div className="pointer-events-none relative z-10 mx-auto flex h-full max-w-6xl flex-col px-5 pb-24 pt-24 xl:justify-center">
         <div className="pointer-events-auto max-w-md">
         <p className="font-term text-xl text-mist flex items-center gap-u2">
           <span className="blink inline-block h-u2 w-u2 bg-teal" aria-hidden />

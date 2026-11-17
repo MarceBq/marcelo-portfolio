@@ -36,7 +36,7 @@ export default function Hotspot({ name, title, sprite, children, className = "",
         onClick={() => dialog.current?.showModal()}
       >
         {sprite}
-        <span className="hotspot-label label">{name}</span>
+        <span className="hotspot-label">{name}</span>
       </button>
 
       <dialog

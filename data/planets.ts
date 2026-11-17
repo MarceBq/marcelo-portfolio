@@ -53,7 +53,7 @@ export const planets: Record<string, PlanetPlacement> = {
       seed: 21,
     },
     desktop: [11, 21],
-    mobile: [20, 36],
+    mobile: [27, 36],
   },
   // The big one: amber giant with rings.
   "ai-automation-scripts": {
@@ -114,6 +114,6 @@ export const planets: Record<string, PlanetPlacement> = {
       seed: 55,
     },
     desktop: [72, 47],
-    mobile: [42, 82],
+    mobile: [34, 80],
   },
 };
