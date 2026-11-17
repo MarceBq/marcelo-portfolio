@@ -363,10 +363,15 @@
 
 .scene {
   /* Just under the nav bar, clear of the title. */
-  --sat-y: calc(var(--px) * 20);
+  --sat-y: calc(var(--px) * 24);
   --ship-y: 56%;
   /* The alien hides on whichever slope of the hill is on screen. */
   --alien-dx: -60;
+}
+@media (min-width: 640px) {
+  .scene {
+    --sat-y: calc(var(--px) * 21);
+  }
 }
 @media (min-width: 1280px) {
   .scene {
