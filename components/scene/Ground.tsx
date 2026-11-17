@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import { palette } from "@/lib/palette";
 import { ditherTile, hillSprite, ridgeTile } from "@/lib/sprites";
+import Alien from "./Alien";
 import Character from "./Character";
 
 const ridge = ridgeTile("night700");
@@ -31,6 +32,8 @@ export default function Ground() {
 
       <div className="layer" data-depth="12" data-lock-y>
         <div className="layer-frame">
+          {/* Drawn first, so the hill hides it until it peeks. */}
+          <Alien />
           {/* Flat ground runs the full width; the hill sprite rises out of it. */}
           <div className="ground" style={vars({ "--h": hill.base })} aria-hidden />
           <svg
