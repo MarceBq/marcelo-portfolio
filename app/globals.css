@@ -125,6 +125,26 @@
     text-shadow: var(--px) var(--px) 0 theme("colors.dusk.500");
   }
 
+  /*
+   * Segmented bar in one element: a hard-stopped fill, with the gaps between
+   * segments cut out by a mask.
+   */
+  .stat-bar {
+    --seg: calc((100% + var(--px)) / var(--max));
+    display: block;
+    height: calc(var(--px) * 2);
+    background: linear-gradient(
+      90deg,
+      currentColor calc(100% * var(--value) / var(--max)),
+      theme("colors.night.900") 0
+    );
+    mask: repeating-linear-gradient(
+      90deg,
+      #000 0 calc(var(--seg) - var(--px)),
+      transparent 0 var(--seg)
+    );
+  }
+
   .label {
     @apply font-pixel uppercase;
     font-size: 0.625rem;

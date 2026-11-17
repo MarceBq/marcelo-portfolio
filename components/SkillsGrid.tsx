@@ -32,7 +32,7 @@ export default function SkillsGrid() {
                     <StatBar
                       value={levelSegments[skill.level]}
                       max={5}
-                      fill={skill.level === "solid" ? "bg-amber" : "bg-teal"}
+                      fill={skill.level === "solid" ? "text-amber" : "text-teal"}
                     />
                   </li>
                 ))}

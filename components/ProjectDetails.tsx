@@ -48,7 +48,7 @@ export default function ProjectDetails({ project, withImages = false }: ProjectD
           <StatBar
             value={Math.round(project.progress / 10)}
             max={10}
-            fill={isAi ? "bg-haze" : "bg-teal"}
+            fill={isAi ? "text-haze" : "text-teal"}
           />
         </div>
       )}
